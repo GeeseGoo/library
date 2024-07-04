@@ -75,4 +75,5 @@ form.addEventListener("submit", submitBook);
 const bookGrid = document.querySelector("books");
 
 addBookToLibrary("50 Shades of Grey", "E.L James", 420, true);
+addBookToLibrary("Call Me By Your Name", "Andre Aciman", 583, false);
 renderBooks();
