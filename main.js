@@ -52,6 +52,7 @@ function renderBooks() {
 			(book, index) =>
 				`<div class="bookitem">
 			<h2 class="info">${book.title}</h2>
+            <h2 class="author">By ${book.author}</h2>
 			<h2 class="pages">${book.pages} Pages</h2>
 			<div class="bookbuttons">
 				<button onclick="toggleRead(${index})" class="${
