@@ -1,14 +1,37 @@
-const myLibrary = [];
-
-function Book(title, author, pages, read) {
-	this.title = title;
-	this.author = author;
-	this.pages = pages;
-	this.read = read;
+class Book {
+	constructor(title, author, pages, read) {
+		this.title = title;
+		this.author = author;
+		this.pages = pages;
+		this.read = read;
+	}
+	toggleRead() {
+		this.read = !this.read;
+		renderBooks();
+	}
 }
+class Library {
+	#myLibrary = [];
+	constructor(defaultLibrary) {
+		this.#myLibrary = defaultLibrary;
+	}
 
-function addBookToLibrary(title, author, pages, read) {
-	myLibrary.push(new Book(title, author, pages, read));
+	addBookToLibrary(title, author, pages, read) {
+		this.#myLibrary.push(new Book(title, author, pages, read));
+	}
+
+	removeSelf(index) {
+		this.#myLibrary.splice(index, 1);
+		renderBooks();
+	}
+
+	toggleRead(index) {
+		this.#myLibrary.toggleRead();
+	}
+
+	get myLibrary() {
+		return [...this.#myLibrary];
+	}
 }
 
 function toggleBookModal() {
@@ -23,31 +46,9 @@ function toggleBookModal() {
 	}
 }
 
-function submitBook(e) {
-	const modal = document.querySelector("dialog");
-
-	modal.hasAttribute("Open") ? (bookButton.textContent = "Add Book") : (bookButton.textContent = "Close");
-
-	const data = new FormData(form);
-	addBookToLibrary(data.get("title"), data.get("author"), data.get("pages"), Boolean(data.get("read")));
-	console.table(myLibrary);
-	form.reset();
-	renderBooks();
-}
-
-function removeSelf(index) {
-	myLibrary.splice(index, 1);
-	renderBooks();
-}
-
-function toggleRead(index) {
-	myLibrary[index].read = !myLibrary[index].read;
-	renderBooks();
-}
-
 function renderBooks() {
 	const container = document.querySelector(".books");
-	const html = myLibrary
+	const html = library.myLibrary
 		.map(
 			(book, index) =>
 				`<div class="bookitem">
@@ -55,10 +56,10 @@ function renderBooks() {
             <h2 class="author">By ${book.author}</h2>
 			<h2 class="pages">${book.pages} Pages</h2>
 			<div class="bookbuttons">
-				<button onclick="toggleRead(${index})" class="${
+				<button onclick="library.toggleRead(${index})" class="${
 					book.read ? "isread" : "notread"
 				} add-books book-utility-button"></button>
-				<button onclick="removeSelf(${index})" class="removebook add-books book-utility-button">
+				<button onclick="library.removeSelf(${index})" class="removebook add-books book-utility-button">
 					Remove
 				</button>
 			</div>
@@ -68,6 +69,18 @@ function renderBooks() {
 
 	container.innerHTML = html;
 }
+
+function submitBook(e) {
+	const modal = document.querySelector("dialog");
+
+	modal.hasAttribute("Open") ? (bookButton.textContent = "Add Book") : (bookButton.textContent = "Close");
+
+	const data = new FormData(form);
+	library.addBookToLibrary(data.get("title"), data.get("author"), data.get("pages"), Boolean(data.get("read")));
+	form.reset();
+	renderBooks();
+}
+
 const bookButton = document.querySelector(".bookbutton .add-books");
 bookButton.addEventListener("click", toggleBookModal);
 const form = document.querySelector("form");
@@ -75,6 +88,19 @@ form.addEventListener("submit", submitBook);
 
 const bookGrid = document.querySelector("books");
 
-addBookToLibrary("50 Shades of Grey", "E.L James", 420, true);
-addBookToLibrary("Call Me By Your Name", "Andre Aciman", 583, false);
+let defaultLibrary = [
+	{
+		title: "50 Shades of Grey",
+		author: "E.L James",
+		pages: 420,
+		read: true,
+	},
+	{
+		title: "Call Me By Your Name",
+		author: "Andre Aciman",
+		pages: 583,
+		read: false,
+	},
+];
+let library = new Library(defaultLibrary);
 renderBooks();
